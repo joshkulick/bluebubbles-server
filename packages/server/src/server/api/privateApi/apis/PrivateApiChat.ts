@@ -19,7 +19,7 @@ export class PrivateApiChat extends PrivateApiAction {
     }: {
         addresses: string[];
         message: string;
-        service?: "iMessage" | "SMS";
+        service?: "iMessage" | "SMS" | "RCS";
         attributedBody?: Record<string, any> | null;
         effectId?: string;
         subject?: string;

@@ -17,11 +17,13 @@ import type {
     UnsendMessageParams,
     EditMessageParams,
     SendAttachmentPrivateApiParams,
-    SendMultipartTextParams
+    SendMultipartTextParams,
+    SendServiceType
 } from "@server/api/types";
 import { Chat } from "@server/databases/imessage/entity/Chat";
 import path from "path";
 import { DBWhereItem } from "@server/databases/imessage/types";
+import { HandleInterface } from "./handleInterface";
 
 export class MessageInterface {
     static possibleReactions: string[] = [
@@ -40,6 +42,46 @@ export class MessageInterface {
     ];
 
     /**
+     * Resolves a chatGuid based on the service parameter.
+     * When service is "imessage" or "sms", overrides the chatGuid prefix.
+     * When service is "auto", checks iMessage availability and falls back to SMS.
+     * When service is not specified, uses the chatGuid as-is (backward compatible).
+     */
+    static async resolveChatGuid(
+        chatGuid: string,
+        service?: SendServiceType
+    ): Promise<string> {
+        if (!service) return chatGuid;
+
+        // Extract the handle/address from the chatGuid
+        const parts = chatGuid.split(";-;");
+        const handle = parts.length > 1 ? parts[parts.length - 1] : chatGuid;
+
+        switch (service) {
+            case "imessage":
+                return `iMessage;-;${handle}`;
+            case "sms":
+                return `SMS;-;${handle}`;
+            case "auto": {
+                try {
+                    const available = await HandleInterface.getMessagesAvailability(handle);
+                    if (available) {
+                        return `iMessage;-;${handle}`;
+                    }
+                } catch (err) {
+                    Server().log(
+                        `iMessage availability check failed for ${handle}, falling back to SMS: ${err}`,
+                        "warn"
+                    );
+                }
+                return `SMS;-;${handle}`;
+            }
+            default:
+                return chatGuid;
+        }
+    }
+
+    /**
      * Sends a message by executing the sendMessage AppleScript
      *
      * @param chatGuid The GUID for the chat
@@ -53,6 +95,7 @@ export class MessageInterface {
         chatGuid,
         message,
         method = "apple-script",
+        service,
         attributedBody = null,
         subject = null,
         effectId = null,
@@ -62,6 +105,9 @@ export class MessageInterface {
         ddScan = false
     }: SendMessageParams): Promise<Message> {
         if (!chatGuid) throw new Error("No chat GUID provided");
+
+        // Resolve the chatGuid based on the service parameter
+        chatGuid = await MessageInterface.resolveChatGuid(chatGuid, service);
 
         Server().log(`Sending message "${message}" to ${chatGuid}`, "debug");
 
@@ -132,6 +178,7 @@ export class MessageInterface {
         attachmentName = null,
         attachmentGuid = null,
         method = "apple-script",
+        service,
         attributedBody = null,
         subject = null,
         effectId = null,
@@ -140,6 +187,9 @@ export class MessageInterface {
         isAudioMessage = false
     }: SendAttachmentParams): Promise<Message> {
         if (!chatGuid) throw new Error("No chat GUID provided");
+
+        // Resolve the chatGuid based on the service parameter
+        chatGuid = await MessageInterface.resolveChatGuid(chatGuid, service);
 
         // Copy the attachment to a more permanent storage
         const newPath = FileSystem.copyAttachment(attachmentPath, attachmentName, method);

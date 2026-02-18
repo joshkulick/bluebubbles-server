@@ -35,6 +35,7 @@ export type MessageResponse = {
     chats?: ChatResponse[];
     attachments?: AttachmentResponse[];
     subject: string;
+    service: string;
     country?: string;
     error: number;
     dateCreated: number;
@@ -96,6 +97,7 @@ export type ChatResponse = {
     properties?: NodeJS.Dict<any>[] | null;
     style: number;
     chatIdentifier: string;
+    serviceName: string;
     isArchived: boolean;
     isFiltered?: boolean;
     displayName: string;

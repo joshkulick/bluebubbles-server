@@ -56,6 +56,7 @@ export class ChatSerializer {
             guid: chat.guid,
             style: chat.style,
             chatIdentifier: chat.chatIdentifier,
+            serviceName: chat.serviceName,
             isArchived: chat.isArchived,
             displayName: chat.displayName
         };

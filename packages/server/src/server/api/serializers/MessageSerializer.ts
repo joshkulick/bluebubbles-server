@@ -145,6 +145,7 @@ export class MessageSerializer {
                 isForNotification
             }),
             subject: message.subject,
+            service: message.service,
             error: message.error,
             dateCreated: message.dateCreated ? message.dateCreated.getTime() : null,
             dateRead: message.dateRead ? message.dateRead.getTime() : null,

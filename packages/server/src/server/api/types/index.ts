@@ -2,10 +2,13 @@ import type { Message } from "@server/databases/imessage/entity/Message";
 import type { ValidRemoveTapback, ValidTapback } from "@server/types";
 import * as net from "net";
 
+export type SendServiceType = "imessage" | "sms" | "auto";
+
 export type SendMessageParams = {
     chatGuid: string;
     message: string;
     method: "apple-script" | "private-api";
+    service?: SendServiceType;
     attributedBody?: Record<string, any> | null;
     subject?: string;
     effectId?: string;
@@ -54,6 +57,7 @@ export type EditMessageParams = {
 export type SendAttachmentParams = {
     chatGuid: string;
     method?: string;
+    service?: SendServiceType;
     attachmentPath: string;
     attachmentName?: string;
     attachmentGuid?: string;

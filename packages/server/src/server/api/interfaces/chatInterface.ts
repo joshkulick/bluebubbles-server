@@ -148,7 +148,7 @@ export class ChatInterface {
     }: {
         addresses: string[];
         message: string;
-        service: "iMessage" | "SMS";
+        service: "iMessage" | "SMS" | "RCS";
         attributedBody?: Record<string, any> | null;
         subject?: string;
         effectId?: string;
@@ -217,7 +217,7 @@ export class ChatInterface {
     }: {
         addresses: string[];
         message: string;
-        service: "iMessage" | "SMS";
+        service: "iMessage" | "SMS" | "RCS";
         tempGuid?: string | null;
     }): Promise<Chat> {
         let chatGuid: string;
@@ -292,7 +292,7 @@ export class ChatInterface {
         addresses: string[];
         message?: string | null;
         method?: "apple-script" | "private-api";
-        service?: "iMessage" | "SMS";
+        service?: "iMessage" | "SMS" | "RCS";
         tempGuid?: string;
         attributedBody?: Record<string, any> | null;
         subject?: string;

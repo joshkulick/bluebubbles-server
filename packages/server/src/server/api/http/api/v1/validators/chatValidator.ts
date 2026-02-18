@@ -44,7 +44,7 @@ export class ChatValidator {
         addresses: "required|array",
         message: "string",
         method: "string|in:apple-script,private-api",
-        service: "string|in:iMessage,SMS",
+        service: "string|in:iMessage,SMS,RCS",
         tempGuid: "string",
         effectId: "string",
         subject: "string",
