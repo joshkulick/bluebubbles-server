@@ -1,3 +1,4 @@
+import { createHmac } from "crypto";
 import axios from "axios";
 import { Server } from "@server";
 import { Loggable } from "@server/lib/logging/Loggable";
@@ -29,7 +30,19 @@ export class WebhookService extends Loggable {
         }
     }
 
+    private getSecret(): string {
+        return Server().repo.getConfig("webhook_secret") as string ?? "";
+    }
+
     private async sendPost(url: string, event: WebhookEvent) {
-        return await axios.post(url, event, { headers: { "Content-Type": "application/json" } });
+        const rawBody = JSON.stringify(event);
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+
+        const secret = this.getSecret();
+        if (secret) {
+            headers["X-Webhook-Signature"] = createHmac("sha256", secret).update(rawBody).digest("hex");
+        }
+
+        return await axios.post(url, rawBody, { headers });
     }
 }
