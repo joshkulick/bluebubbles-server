@@ -20,6 +20,7 @@ import { BsChevronDown } from 'react-icons/bs';
 import { AiOutlineInfoCircle, AiOutlinePlus } from 'react-icons/ai';
 import { WebhooksTable } from '../../components/tables/WebhooksTable';
 import { AddWebhookDialog } from '../../components/modals/AddWebhookDialog';
+import { WebhookSecretField } from '../../components/fields/WebhookSecretField';
 import { useAppSelector } from '../../hooks';
 
 
@@ -98,6 +99,8 @@ export const ApiLayout = (): JSX.Element => {
                         </Popover>
                     </Flex>
                     <Divider orientation='horizontal' />
+                    <Spacer />
+                    <WebhookSecretField />
                     <Spacer />
                     <Box>
                         <Menu>
